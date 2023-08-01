@@ -16,6 +16,14 @@ def criar_arquivo_modificado(arquivo_origem, arquivo_destino):
     df['RUBRICA'] = df['RUBRICA'].str.replace('Furto (art. 155)                                                                 - TRANSEUNTE', 'FURTO - OUTROS')
     df['RUBRICA'] = df['RUBRICA'].str.replace('Furto (art. 155)                                                                 - OUTROS', 'FURTO - OUTROS')
     df['RUBRICA'] = df['RUBRICA'].str.replace('Furto (art. 155)                                                                 - ESTABELECIMENTO COMERCIAL', 'FURTO - OUTROS')
+    df['RUBRICA'] = df['RUBRICA'].str.replace('Furto (art. 155)                                                                 - INTERIOR TRANSPORTE COLETIVO', 'FURTO - OUTROS')
+    df['RUBRICA'] = df['RUBRICA'].str.replace('Furto (art. 155)                                                                 - INTERIOR ESTABELECIMENTO', 'FURTO - OUTROS')
+    df['RUBRICA'] = df['RUBRICA'].str.replace('Furto (art. 155)                                                                 - ESTABELECIMENTO-OUTROS', 'FURTO - OUTROS')
+    df['RUBRICA'] = df['RUBRICA'].str.replace('Furto (art. 155)                                                                 - ESTABELECIMENTO ENSINO', 'FURTO - OUTROS')
+    df['RUBRICA'] = df['RUBRICA'].str.replace('A.I.-Furto (art. 155)                                                            - OUTROS', 'FURTO - OUTROS')
+    df['RUBRICA'] = df['RUBRICA'].str.replace('A.I.-Furto (art. 155)                                                            - VEICULO', 'FURTO - OUTROS')
+
+
 
     # Salvar o novo arquivo com as modificações
     df.to_excel(arquivo_destino, index=False)
@@ -34,8 +42,8 @@ def remover_duplicatas_num_bo(dados):
     dados = dados.drop_duplicates(subset=['NUM_BO'])
     return dados
 
-def converter_logradouros_minuscula(dados):
-    dados['LOGRADOURO'] = dados['LOGRADOURO'].str.lower()
+def converter_logradouros_maiuscula(dados):
+    dados['LOGRADOURO'] = dados['LOGRADOURO'].str.upper()
 
     if dados['LATITUDE'].dtype == 'O':
         dados['LATITUDE'] = dados['LATITUDE'].str.replace(',', '.').astype(float)
@@ -56,9 +64,16 @@ def contar_ocorrencias_por_tipo_veiculo(dados):
     contagem_tipo_veiculo = dados_deduplicated.groupby(['RUBRICA', 'DESCR_TIPO_VEICULO']).size()
     return contagem_tipo_veiculo
 
+
 def contar_ocorrencias_por_marca_veiculo(dados):
-    contagem_marca_veiculo = dados.drop_duplicates(subset=['PLACA_VEICULO', 'DESCR_TIPO_VEICULO', 'RUBRICA'])['DESCR_MARCA_VEICULO'].value_counts()
+    # Filtra os dados apenas com as Rubricas "Roubo - VEICULO" e "Furto - VEICULO"
+    dados_filtered = dados[(dados['RUBRICA'] == 'ROUBO - VEICULO') | (dados['RUBRICA'] == 'FURTO - VEICULO')]
+
+    # Conta as ocorrências de cada marca de veículo separadamente para cada rubrica
+    contagem_marca_veiculo = dados_filtered.groupby(['RUBRICA', 'DESCR_MARCA_VEICULO']).size()
+
     return contagem_marca_veiculo
+
 
 def contar_ocorrencias_por_rubrica(dados):
     dados['RUBRICA'] = dados['RUBRICA'].str.strip()

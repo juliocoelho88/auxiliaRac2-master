@@ -1,4 +1,5 @@
 from funcoes import *
+from gerar_mapa import gerar_mapa_por_rubrica
 
 if __name__ == "__main__":
     # Substitua 'caminho/do/arquivo.xlsx' pelo caminho do seu arquivo Excel
@@ -15,7 +16,7 @@ if __name__ == "__main__":
     dados = remover_duplicatas_num_bo(dados)
 
     # Converter todas as entradas da coluna 'LOGRADOURO' para letras minúsculas
-    dados = converter_logradouros_minuscula(dados)
+    dados = converter_logradouros_maiuscula(dados)
 
     # Realizar as contagens
     contagem_periodo = contar_ocorrencias_por_periodo(dados)
@@ -81,3 +82,13 @@ if __name__ == "__main__":
     # Agora você pode imprimir a contagem de logradouros para a rubrica "Roubo - VEICULO"
     print("\nContagem de logradouros por rubrica (Roubo - VEICULO):")
     print(contagem_logradouro_por_rubrica['ROUBO - VEICULO'])
+
+    # Chama a função para obter a contagem de ocorrências por marca de veículo
+    contagem_por_marca = contar_ocorrencias_por_marca_veiculo(dados)
+
+    # Imprime o resultado
+    print("Contagem de ocorrências por marca de veículo:")
+    print(contagem_por_marca)
+
+    # Chama a função para gerar os mapas de localização
+    gerar_mapa_por_rubrica(dados)

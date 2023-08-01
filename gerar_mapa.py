@@ -1,15 +1,16 @@
-import os
 import pandas as pd
+import os
 import folium
-
+from selenium import webdriver
+from selenium.webdriver.chrome.options import Options
 
 def gerar_mapa_por_rubrica(dados):
-    # Criar o diretório 'mapa_Localização' se não existir
-    os.makedirs('mapa_Localização', exist_ok=True)
+    # Criar o diretório 'mapa_Localizacao' se não existir
+    os.makedirs('mapa_Localizacao', exist_ok=True)
     # Remover espaços indesejados antes do caractere "-" na coluna 'RUBRICA'
     dados['RUBRICA'] = dados['RUBRICA'].str.strip()
 
-    for categoria, grupo in dados.groupby('CATEGORIA_RUBRICA'):
+    for categoria, grupo in dados.groupby('RUBRICA'):
         # Verificar se as colunas 'LATITUDE' e 'LONGITUDE' estão presentes
         if 'LATITUDE' in grupo.columns and 'LONGITUDE' in grupo.columns:
             mapa = folium.Map(location=[-23.550520, -46.633308], zoom_start=12)
@@ -22,5 +23,15 @@ def gerar_mapa_por_rubrica(dados):
 
             # Obter o caminho para salvar o arquivo HTML
             categoria_limpa = "".join(c for c in categoria if c.isalnum())  # Remover caracteres inválidos
-            path = f"mapa_Localização/mapa_{categoria_limpa}.html"
-            mapa.save(path)
+            html_path = f"mapa_Localizacao/mapa_{categoria_limpa}.html"
+            png_path = f"mapa_Localizacao/mapa_{categoria_limpa}.png"
+
+            mapa.save(html_path)
+
+            # Capturar uma imagem do mapa renderizado e salvar como PNG
+            chrome_options = Options()
+            chrome_options.add_argument("--headless")  # Executar em modo headless (sem janela)
+            driver = webdriver.Chrome(options=chrome_options)
+            driver.get(f"file://{os.path.abspath(html_path)}")
+            driver.save_screenshot(png_path)
+            driver.quit
